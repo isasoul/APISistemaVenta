@@ -55,6 +55,7 @@ public partial class DbventaContext : DbContext
                 .HasMaxLength(50)
                 .IsUnicode(false)
                 .HasColumnName("nombre");
+
         });
 
         modelBuilder.Entity<DetalleVentum>(entity =>
