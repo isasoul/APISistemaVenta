@@ -3,10 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SistemaVenta.DAL.DBContext;
+using SistemaVenta.DAL.Repositorios;
+using SistemaVenta.DAL.Repositorios.Contrato;
+using SistemaVenta.Utility;
 
 namespace SistemaVenta.IOC
 {
@@ -18,6 +22,11 @@ namespace SistemaVenta.IOC
 			{
 				options.UseSqlServer(configuration.GetConnectionString("cadenaSQl"));
 			});
+
+			services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+			services.AddScoped<IVentaRepository, VentaRepository>();
+
+			services.AddAutoMapper(typeof(AutoMapperProfile));
 		}
 		
 

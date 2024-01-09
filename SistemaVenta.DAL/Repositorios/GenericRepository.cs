@@ -7,7 +7,7 @@ using SistemaVenta.DAL.Repositorios.Contrato;
 using SistemaVenta.DAL.DBContext;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
-
+using SistemaVenta.Model.YourOutputDirectory;
 
 namespace SistemaVenta.DAL.Repositorios
 {
@@ -22,11 +22,12 @@ namespace SistemaVenta.DAL.Repositorios
 		}
 
 
-		public Task<TModel> Obtener(Expression<Func<TModel, bool>> filtro)
+		public async Task<TModel> Obtener(Expression<Func<TModel, bool>> filtro)
 		{
 			try
 			{
-				TModel modelo = await
+				TModel modelo = await _dbContext.Set<TModel>().FirstOrDefaultAsync(filtro);
+				return modelo;
 			}
 			catch (Exception)
 			{
@@ -35,10 +36,13 @@ namespace SistemaVenta.DAL.Repositorios
 			}
 		}
 
-		public Task<TModel> Crear(TModel modelo)
+		public async Task<TModel> Crear(TModel modelo)
 		{
 			try
 			{
+				_dbContext.Set<TModel>().Add(modelo);
+				await _dbContext.SaveChangesAsync();
+				return modelo;
 
 			}
 			catch (Exception)
@@ -48,10 +52,13 @@ namespace SistemaVenta.DAL.Repositorios
 			}
 		}
 
-		public Task<bool> Editar(TModel modelo)
+		public async Task<bool> Editar(TModel modelo)
 		{
 			try
 			{
+				_dbContext.Set<TModel>().Update(modelo);
+				await _dbContext.SaveChangesAsync();
+				return true;
 
 			}
 			catch (Exception)
@@ -62,10 +69,13 @@ namespace SistemaVenta.DAL.Repositorios
 		}
 	
 
-		public Task<bool> Eliminar(TModel modelo)
+		public async Task<bool> Eliminar(TModel modelo)
 		{
 			try
 			{
+				_dbContext.Set<TModel>().Remove(modelo);
+				await _dbContext.SaveChangesAsync();
+				return true;
 
 			}
 			catch (Exception)
@@ -75,11 +85,13 @@ namespace SistemaVenta.DAL.Repositorios
 			}
 		}
 
-		public Task<IQueryable<TModel>> Consultar(Expression<Func<TModel, bool>> filtro = null)
+		public async Task<IQueryable<TModel>> Consultar(Expression<Func<TModel, bool>> filtro = null)
 		{
 			try
 			{
-
+				IQueryable<TModel> queryModelo = filtro == null ? _dbContext.Set<TModel>(): _dbContext.Set<TModel>().Where(filtro);
+				return queryModelo;
+			
 			}
 			catch (Exception)
 			{
@@ -87,5 +99,7 @@ namespace SistemaVenta.DAL.Repositorios
 				throw;
 			}
 		}
+
+		
 	}
 }
