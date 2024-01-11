@@ -15,14 +15,14 @@ using SistemaVenta.Model.YourOutputDirectory;
 
 namespace SistemaVenta.BLL.Servicios
 {
-	public class UsuarioService :IUsuarioService
+	public class UsuarioService : IUsuarioService
 	{
 
-		private readonly IGenericRepository<Rol> _usuarioRepositorio;
+		private readonly IGenericRepository<Usuario> _usuarioRepositorio;
 
 		private readonly IMapper _mapper;
 
-		public UsuarioService(IGenericRepository<Rol> usuarioRepositorio, IMapper mapper)
+		public UsuarioService(IGenericRepository<Usuario> usuarioRepositorio, IMapper mapper)
 		{
 			_usuarioRepositorio = usuarioRepositorio;
 			_mapper = mapper;
@@ -44,24 +44,95 @@ namespace SistemaVenta.BLL.Servicios
 			}
 		}
 
-		public Task<SesionDTO> ValidarCredenciales(string correo, string clave)
+		public async Task<SesionDTO> ValidarCredenciales(string correo, string clave)
 		{
-			throw new NotImplementedException();
+			try
+			{
+				var queryUsuario = await _usuarioRepositorio.Consultar(u =>
+				u.Correo == correo &&
+				u.Clave == clave
+				);
+				if (queryUsuario.FirstOrDefault() == null)
+					throw new TaskCanceledException("El ususario no existe");
+
+				Usuario devolverUsuario = queryUsuario.Include(rol => rol.IdRolNavigation).First();
+
+				return _mapper.Map<SesionDTO>(devolverUsuario);
+			}
+			catch 
+			{
+
+				throw;
+			}
 		}
 
-		public Task<UsuarioDTO> Crear(UsuarioDTO modelo)
+		public async Task<UsuarioDTO> Crear(UsuarioDTO modelo)
 		{
-			throw new NotImplementedException();
+			try
+			{
+				var usuarioCreado = await _usuarioRepositorio.Crear(_mapper.Map<Usuario>(modelo));
+
+				if (usuarioCreado.IdUsuario == 0)
+					throw new TaskCanceledException("No se pudo crear");
+				var query = await _usuarioRepositorio.Consultar (u => u.IdUsuario == usuarioCreado.IdUsuario);
+				usuarioCreado = query.Include(rol => rol.IdRolNavigation).First();
+
+				return _mapper.Map<UsuarioDTO>(usuarioCreado);
+			}
+			catch (Exception)
+			{
+
+				throw;
+			}
 		}
 
-		public Task<bool> Editar(UsuarioDTO modelo)
+		public async Task<bool> Editar(UsuarioDTO modelo)
 		{
-			throw new NotImplementedException();
+			try
+			{
+				var usuarioModelo= _mapper.Map<Usuario>(modelo);
+				var usuarioEncontrado = await _usuarioRepositorio.Obtener(u => u.IdUsuario==usuarioModelo.IdUsuario);
+				if (usuarioEncontrado == null)
+					throw new TaskCanceledException("Usuario No Existe");
+				usuarioEncontrado.NombreCompleto = usuarioModelo.NombreCompleto;
+				usuarioEncontrado.Correo =usuarioModelo.Correo;
+				usuarioEncontrado.IdRol = usuarioModelo.IdRol;
+				usuarioEncontrado.Clave =usuarioModelo.Clave;
+				usuarioEncontrado.EsActivo = usuarioModelo.EsActivo;
+
+				bool respuesta= await _usuarioRepositorio.Editar(usuarioEncontrado);
+				if (!respuesta)
+					throw new TaskCanceledException("No se pudo editar");
+
+				return respuesta;
+			}
+			catch 
+			{
+
+				throw;
+			}		
 		}
 
-		public Task<bool> Eliminar(int id)
+		public async Task<bool> Eliminar(int id)
 		{
-			throw new NotImplementedException();
+			try
+			{
+				var usuarioEncontrado = await _usuarioRepositorio.Obtener(u=> u.IdUsuario==id);
+				if (usuarioEncontrado == null)
+					throw new TaskCanceledException("El Usuario no existe");
+
+				bool respuesta = await _usuarioRepositorio.Eliminar(usuarioEncontrado);
+				if (!respuesta)
+					throw new TaskCanceledException("No se pudo eliminar");
+
+				return respuesta;
+			}
+			catch 
+			{
+
+				throw;
+			}		
+		
 		}
 
 	

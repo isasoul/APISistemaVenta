@@ -14,5 +14,6 @@ public partial class Rol
     public virtual ICollection<MenuRol> MenuRols { get; } = new List<MenuRol>();
 
     public virtual ICollection<Usuario> Usuarios { get; } = new List<Usuario>();
+
 	public object IdRolNavigation { get; set; }
 }

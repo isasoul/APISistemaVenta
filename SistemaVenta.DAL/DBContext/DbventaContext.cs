@@ -39,8 +39,11 @@ public partial class DbventaContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Categoria>(entity =>
+		
+
+		modelBuilder.Entity<Categoria>(entity =>
         {
+
             entity.HasKey(e => e.IdCategoria).HasName("PK__Categori__8A3D240CC4FE27A7");
 
             entity.Property(e => e.IdCategoria).HasColumnName("idCategoria");
@@ -165,7 +168,8 @@ public partial class DbventaContext : DbContext
                 .HasConstraintName("FK__Producto__idCate__48CFD27E");
         });
 
-        modelBuilder.Entity<Rol>(entity =>
+		modelBuilder.Entity<Rol>().Ignore(e => e.IdRolNavigation);
+		modelBuilder.Entity<Rol>(entity =>
         {
             entity.HasKey(e => e.IdRol).HasName("PK__Rol__3C872F76D7845075");
 
@@ -180,6 +184,7 @@ public partial class DbventaContext : DbContext
                 .HasMaxLength(50)
                 .IsUnicode(false)
                 .HasColumnName("nombre");
+            
         });
 
         modelBuilder.Entity<Usuario>(entity =>

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using SistemaVenta.DTO;
+using SistemaVenta.Model.YourOutputDirectory;
 
 namespace SistemaVenta.BLL.Servicios.Contrato
 {
